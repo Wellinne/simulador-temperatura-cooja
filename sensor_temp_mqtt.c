@@ -4,7 +4,7 @@
 #include "net/rime/collect.h"
 #include <string.h>
 
-#include "dev/leds.h"
+#include "leds.h"
 #include "dev/button-sensor.h"
 
 #include "net/netstack.h"
@@ -91,10 +91,10 @@ static void sensor_avaliator(int temp){
         led_blue();
         printf("Temperatura ok recebida na LED [AZUL]: %d\n", temp);
     } 
-    if (temp > -18 && temp <= 10) {
+    if (temp > -18 && temp <= 0) {
         led_red();
         printf("Temperatura ruim recebida na LED [VERMELHO]: %d\n", temp);
-    } 
+    }
 
     printf("\n\n");  
 }
@@ -165,7 +165,6 @@ static const struct unicast_callbacks unicast_callbacks = { recv };
 PROCESS_THREAD(hello_world_process2, ev, data)
 {
   static struct etimer periodic;
-  static struct etimer et;
 
   PROCESS_BEGIN();
 
@@ -180,7 +179,7 @@ PROCESS_THREAD(hello_world_process2, ev, data)
 
   while(1) {
     etimer_set(&periodic, CLOCK_SECOND * 30);
-    PROCESS_WAIT_UNTIL(etimer_expired(&et));
+    PROCESS_WAIT_UNTIL(etimer_expired(&periodic));
 
     if (!(linkaddr_node_addr.u8[0] == 1 || linkaddr_node_addr.u8[0] == 2)) {
       SensorData sensorData = get_light();
@@ -189,7 +188,7 @@ PROCESS_THREAD(hello_world_process2, ev, data)
       if (linkaddr_node_addr.u8[0] <= 3) {
         dest.u8[0] = 1; dest.u8[1] = 0; // envia para sink 1.0
       } else {
-        dest.u8[0] = 2; dest.u8[1] = 0; // envia para sink 4.0
+        dest.u8[0] = 2; dest.u8[1] = 0; // envia para sink 2.0
       }
 
       packetbuf_clear();
